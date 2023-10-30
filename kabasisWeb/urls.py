@@ -34,6 +34,8 @@ urlpatterns = [
     path('', include('KabasisWebApp.urls')),
 
     path('cursos/', include('CursosApp.urls')),
+    
+    path('', include('SurveyApp.urls')),
 
 ]
 
