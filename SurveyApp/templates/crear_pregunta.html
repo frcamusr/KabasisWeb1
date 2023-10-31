@@ -5,7 +5,7 @@
 <div class="container-fluid py-5">
     <div class="container bg-white p-5 rounded">
         <h2 class="text-center mb-4">Crear Pregunta</h2>
-        <form method="post" name="crear_pregunta" action="{% url 'crear_pregunta' %}" class="form" id="question-form">
+        <form method="post" name="crear_pregunta" action="{% url 'crear_pregunta' idCurso unidad %}" class="form" id="question-form">
             {% csrf_token %}
             <div class="form-group">
                 {{ form.question_type|as_crispy_field }}

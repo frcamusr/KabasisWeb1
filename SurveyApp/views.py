@@ -3,18 +3,29 @@ from django.http import HttpResponse
 from .forms import QuestionForm, AnswerForm
 from .models import Question, Answer
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 
 def preguntas(request):
     questions = Question.objects.all()
     return render(request, 'preguntas.html', {'questions': questions})
 
+def quiz(request, idCurso, unidad):
+    questions = Question.objects.filter(curso_id=idCurso, unidad_id=unidad)
+    return render(request, 'quiz.html', {'questions': questions, 'idCurso': idCurso, 'unidad': unidad})
 
-def create_question(request):
+
+
+
+
+def create_question(request, idCurso, unidad):
     if request.method == 'POST':
         form = QuestionForm(request.POST)
         if form.is_valid():
             # Guardar la pregunta y sus opciones
             question = Question()
+            # question curso_id es el id del curso y unidad_id es el id de la unidad
+            question.curso_id = idCurso
+            question.unidad_id = unidad
             question.question_type = form.cleaned_data['question_type']
             question.text = form.cleaned_data['text']
             question.option_a = form.cleaned_data['option_a']
@@ -23,16 +34,16 @@ def create_question(request):
             question.option_d = form.cleaned_data['option_d']
             question.correct_answer = form.cleaned_data['correct_answer']
             question.save()
-        return redirect('preguntas')
+        return redirect(reverse('quiz', args=[idCurso, unidad]))
     else:
         form = QuestionForm()
-    return render(request, 'crear_pregunta.html', {'form': form})
+    return render(request, 'crear_pregunta.html', {'form': form, 'idCurso': idCurso, 'unidad': unidad})
 
 
 @login_required 
-def formulario(request):
+def formulario(request, idCurso, unidad):
     # Obtener todas las preguntas
-    questions = Question.objects.all()
+    questions = Question.objects.filter(curso_id=idCurso, unidad_id=unidad)
     if request.method == 'POST':
         
         for pregunta in questions:

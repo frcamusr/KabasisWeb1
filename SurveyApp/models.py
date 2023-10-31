@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from CursosApp.models import Curso, UnidadCurso  # Asegúrate de importar los modelos correctos
 
 class Question(models.Model):
     id=models.AutoField(primary_key=True)
@@ -11,6 +12,11 @@ class Question(models.Model):
     option_c = models.CharField(max_length=255, null=True)
     option_d = models.CharField(max_length=255, null=True)
     correct_answer = models.CharField(max_length=1, null=True)
+
+    curso = models.ForeignKey(Curso, on_delete=models.CASCADE)  # Campo de clave foranea para curso_id
+    unidad = models.ForeignKey(UnidadCurso, on_delete=models.CASCADE)  # Campo de clave foranea para unidad_id
+
+
     def __str__(self):
         return self.id
     

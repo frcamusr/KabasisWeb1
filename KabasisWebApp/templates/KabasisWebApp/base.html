@@ -76,6 +76,9 @@
                             <a class="nav-link text-uppercase text-expanded" href="{% url 'Contacto' %}">Contacto</a>
                         </li>
                         <li class="nav-item {% if request.path == '/blog' %} active{% endif %} px-lg-4">
+                            <a class="nav-link text-uppercase text-expanded" href="{% url 'editContenido' %}">Editor de Contenido</a>
+                        </li>
+                        <li class="nav-item {% if request.path == '/blog' %} active{% endif %} px-lg-4">
                             <a class="nav-link text-uppercase text-expanded" href="{% url 'Blog' %}">Blog</a>
                         </li>
                     </ul>
@@ -125,9 +128,16 @@
 
         </footer>
 
-        <!-- Bootstrap -->
-        <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
-        <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- jQuery desde CDN -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap desde CDN -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+
+
+
+        
         <!--swift alert2-->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>

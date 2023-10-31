@@ -10,6 +10,19 @@ urlpatterns = [
     path('tienda',views.tienda, name="Tienda"),
     path('blog',views.blog, name="Blog"),
     path('contacto',views.contacto, name="Contacto"),
+    # editContenido
+    path('editContenido',views.editContenido, name="editContenido"),
+    path('obtener_unidades/<int:curso_id>/', views.obtener_unidades, name="obtener_unidades"),
+    # editContenido agregar quiz usando el camino /quiz/'idCurso'/'unidad'/ usando la vista quiz en la app SurveyApp
+
+    # path('quiz/<int:idCurso>/<int:unidad>/', views.quiz, name="quiz"),
+
+
+
+
+
+
+
     
 
 ]
