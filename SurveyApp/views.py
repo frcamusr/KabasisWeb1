@@ -80,8 +80,10 @@ def formulario(request, idCurso, unidad):
 
 def delete_question(request, id):
     question = Question.objects.get(id=id)
+    idCurso = question.curso_id
+    unidad = question.unidad_id
     question.delete()
-    return redirect('preguntas')
+    return redirect(reverse('quiz', args=[idCurso, unidad]))
 
 # def agradecimientos, este tendra un mensaje de agradecimiento por haber respondido la encuesta
 def agradecimientos(request):
@@ -98,19 +100,24 @@ def update_question(request, id):
         form = QuestionForm(request.POST)
         question = Question.objects.get(id=id)
         tipo = question.question_type
+        idCurso = question.curso_id
+        unidad = question.unidad_id
+
  
         
         if form.is_valid():
             # guardar la pregunta y sus opciones, usando el id de la pregunta
+
             if tipo == 'text':
                 #form = QuestionForm(initial={'text': question.text})
                 # guardar las preguntas con el formulario de texto
                 question.text = form.cleaned_data['text']
                 question.save()
-                return redirect('preguntas')
+                return redirect(reverse('quiz', args=[idCurso, unidad]))
 
             else:
                 #form = QuestionForm(initial={'text': question.text, 'option_a': question.option_a, 'option_b': question.option_b, 'option_c': question.option_c, 'option_d': question.option_d, 'correct_answer': question.correct_answer})
+
                 question.text = form.cleaned_data['text']
                 question.option_a = form.cleaned_data['option_a']
                 question.option_b = form.cleaned_data['option_b']
@@ -118,7 +125,7 @@ def update_question(request, id):
                 question.option_d = form.cleaned_data['option_d']
                 question.correct_answer = form.cleaned_data['correct_answer']
                 question.save()
-                return redirect('preguntas')
+                return redirect(reverse('quiz', args=[idCurso, unidad]))
         else:
             if tipo == 'text':
                 form = QuestionForm(initial={'text': question.text})
