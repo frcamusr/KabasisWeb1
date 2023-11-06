@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listar Quiz</title>
+</head>
+
+<body>
+    <h1>Quiz para el Curso {{ idCurso }} - Unidad {{ unidad }}</h1>
+    <div>
+        {% if quizzes %}
+            <h2>Quizzes Existentes:</h2>
+            <ul>
+                {% for q in quizzes %}
+                    <li>
+                        Quiz {{ q.id }} - 
+                        <a href="{% url 'editar_quiz' q.id %}">Editar Quiz</a>
+                    </li>
+                    <li>
+                        Quiz {{ q.id }} - 
+                        <a href="{% url 'eliminar_quiz' q.id %}">Eliminar Quiz</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No existen quizzes para este curso y unidad.</p>
+        {% endif %}
+
+        <a href="{% url 'crear_quiz' idCurso=idCurso unidad=unidad %}">
+            <button>Crear Nuevo Quiz</button>
+        </a>
+    </div>
+
+    <div>
+        {% if contenido %}
+        <h2>Contenido Existentes:</h2>
+        <ul>
+            {% for con in contenido %}
+                <li>
+                    Quiz {{ con.id }} - 
+                    <a href="{% url 'editar_contenido' con.id %}">Editar Contenido</a>
+                </li>
+                <li>
+                    Quiz {{ q.id }} - 
+                    <a href="{% url 'eliminar_contenido' con.id %}">Eliminar Contenido</a>
+                </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+            <p>No existen Contenido para este curso y unidad.</p>
+        {% endif %}
+
+        <a href="{% url 'crear_contenido' idCurso=idCurso unidad=unidad %}">
+            <button>Crear Nuevo Contenido</button>
+        </a>
+    </div>
+
+    <div>
+        {% if video %}
+        <h2>Video Existentes:</h2>
+        <ul>
+            {% for vi in contenido %}
+                <li>
+                    Quiz {{ vi.id }} - 
+                    <a href="{% url 'editar_video' vi.id %}">Editar Video</a>
+                </li>
+                <li>
+                    Quiz {{ vi.id }} - 
+                    <a href="{% url 'eliminar_video' vi.id %}">Eliminar Video</a>
+                </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+            <p>No existen Videos para este curso y unidad.</p>
+        {% endif %}
+
+        <a href="{% url 'crear_video' idCurso=idCurso unidad=unidad %}">
+            <button>Crear Nuevo Video</button>
+        </a>
+    </div>
+
+    <div>
+        {% if actividades %}
+        <h2>Actividad Existentes:</h2>
+        <ul>
+            {% for act in contenido %}
+                <li>
+                    Quiz {{ act.id }} - 
+                    <a href="{% url 'editar_actividades' act.id %}">Editar Contenido</a>
+                </li>
+                <li>
+                    Quiz {{ act.id }} - 
+                    <a href="{% url 'eliminar_contenido' act.id %}">Eliminar Contenido</a>
+                </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+            <p>No existen Actividad para este curso y unidad.</p>
+        {% endif %}
+
+        <a href="{% url 'crear_actividad' idCurso=idCurso unidad=unidad %}">
+            <button>Crear Nuevo Actividad</button>
+        </a>
+    </div>
+</body>
+
+</html>

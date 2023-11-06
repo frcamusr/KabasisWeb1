@@ -21,6 +21,7 @@ class QuestionForm(Form):
     # Sí la pregunta es de opción múltiple
     correct_answer = forms.ChoiceField(choices=[('', ''),('a', 'Opción A'), ('b', 'Opción B'), ('c', 'Opción C'), ('d', 'Opción D')], required=False)
     
+    
     # validar los datos del formulario y guardar la pregunta
     def clean(self):
         return super().clean()
@@ -39,6 +40,15 @@ class AnswerForm(Form):
     # Validar los datos del formulario
     def clean(self):
         # Validar los datos del formulario
+        return super().clean()
+    
+class ContenidoForm(Form):
+    # titulo del contenido
+    titulo = forms.CharField(max_length=255)
+    # contenido del contenido
+    contenido = forms.CharField(max_length=500)
+    # validar los datos del formulario y guardar la pregunta
+    def clean(self):
         return super().clean()
     
 

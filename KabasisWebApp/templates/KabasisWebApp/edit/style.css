@@ -1,0 +1,12 @@
+/* style.css */
+
+.seleccionado-curso {
+    background-color: red;
+    color: white;
+}
+
+.seleccionado-unidad {
+    background-color: blue;
+    color: white;
+}
+
