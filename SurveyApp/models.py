@@ -8,7 +8,7 @@ class Question(models.Model):
         ('text', 'Texto'),
     ]
     
-    quiz = models.ForeignKey('Quiz', on_delete=models.CASCADE)
+    quiz = models.ForeignKey('Quiz', on_delete=models.CASCADE, null=True)
     question_type = models.CharField(max_length=255, choices=QUESTION_TYPES)
     text = models.CharField(max_length=255)
     option_a = models.CharField(max_length=255, null=True)
@@ -35,7 +35,7 @@ class Answer(models.Model):
 class Contenido(models.Model):
     id=models.AutoField(primary_key=True)
     titulo = models.CharField(max_length=255)
-    contenido = models.TextField()
+    texto = models.TextField()
     unidad = models.ForeignKey(UnidadCurso, on_delete=models.CASCADE)
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
     def __str__(self):
@@ -52,6 +52,7 @@ class Quiz(models.Model):
 # clase de video que solo contiene un enlace de youtube para cada unidad del curso, relacion muchos videos a una unidad
 class Video(models.Model):
     id=models.AutoField(primary_key=True)
+    titulo = models.CharField(max_length=255)
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
     unidad = models.ForeignKey(UnidadCurso, on_delete=models.CASCADE)
     link = models.CharField(max_length=255)
@@ -60,14 +61,21 @@ class Video(models.Model):
     def __str__(self):
         return self.id
     
-# clase de actividad que contiene una instancia de contenido, questions y answers, relacion muchos a uno entre actividad y unidad
+# clase para Actividad, tendrá los atributos id, curso y unidad
 class Actividad(models.Model):
     id=models.AutoField(primary_key=True)
-    contenido = models.ForeignKey(Contenido, on_delete=models.CASCADE)
-    questions = models.ManyToManyField(Question)
-    answers = models.ManyToManyField(Answer)
-    unidad = models.ForeignKey(UnidadCurso, on_delete=models.CASCADE)
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
+    unidad = models.ForeignKey(UnidadCurso, on_delete=models.CASCADE)
+
+    # atributos de titulo y descripción
+    titulo = models.CharField(max_length=255)
+    descripcion = models.TextField()
+
+    # atributos de muchos a muchos con los modelos de Contenido y pregunta
+    contenidos = models.ManyToManyField(Contenido, null=True)
+    preguntas = models.ManyToManyField(Question, null=True)
+
     def __str__(self):
         return self.id
+    
 

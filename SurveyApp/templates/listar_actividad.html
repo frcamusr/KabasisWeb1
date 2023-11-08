@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listar Actividad</title>
+</head>
+
+<body>
+    <h1>Detalles de la Actividad</h1>
+
+    <h2>Contenidos Asociados</h2>
+    {% if contenidos %}
+    <ul>
+        {% for contenido in contenidos %}
+        <li>{{ contenido.id }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No hay contenidos asociados a esta actividad.</p>
+    <a href="{% url 'crear_texto2' id=actividad.id %}" class="btn btn-primary btn-block">Crear Pregunta</a>
+    {% endif %}
+
+    <h2>Preguntas Asociadas</h2>
+    {% if preguntas %}
+    <ul>
+        {% for pregunta in preguntas %}
+        <li>{{ pregunta.id }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No hay preguntas asociadas a esta actividad.</p>
+    <a href="{% url 'crear_pregunta2' id=actividad.id %}" class="btn btn-primary btn-block">Crear Pregunta</a>
+    {% endif %}
+</body>
+
+</html>

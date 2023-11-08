@@ -1,11 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
-from .forms import QuestionForm, AnswerForm, ContenidoForm
+from .forms import QuestionForm, AnswerForm, TextForm, VideoForm, ActividadForm
 from .models import Question, Answer, Contenido, Quiz, Video, Actividad
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-
-
 
 
 
@@ -26,17 +24,18 @@ def create_question(request, id):
             question.correct_answer = form.cleaned_data['correct_answer']
             question.save()
             # Redirigir a la página del quiz
-            return redirect(reverse('quiz', args=[id]))
+            return redirect(reverse('listar_quiz', args=[id]))
     else:
         form = QuestionForm()
     return render(request, 'crear_pregunta.html', {'form': form, 'id_quiz': id})
+
 
 
 def delete_question(request, id):
     question = Question.objects.get(quiz_id=id)
 
     question.delete()
-    return redirect(reverse('quiz', args=[id]))
+    return redirect(reverse('listar_quiz', args=[id]))
 
 
 # def update_question, este tendra un formulario para actualizar la pregunta
@@ -55,7 +54,7 @@ def update_question(request, id):
                 # guardar las preguntas con el formulario de texto
                 question.text = form.cleaned_data['text']
                 question.save()
-                return redirect(reverse('quiz', args=[id]))
+                return redirect(reverse('listar_quiz', args=[id]))
 
             else:
                 #form = QuestionForm(initial={'text': question.text, 'option_a': question.option_a, 'option_b': question.option_b, 'option_c': question.option_c, 'option_d': question.option_d, 'correct_answer': question.correct_answer})
@@ -67,7 +66,7 @@ def update_question(request, id):
                 question.option_d = form.cleaned_data['option_d']
                 question.correct_answer = form.cleaned_data['correct_answer']
                 question.save()
-                return redirect(reverse('quiz', args=[id]))
+                return redirect(reverse('listar_quiz', args=[id]))
         else:
             if tipo == 'text':
                 form = QuestionForm(initial={'text': question.text})
@@ -78,7 +77,25 @@ def update_question(request, id):
     return render(request, 'update_question.html', {'form': form, 'question': question, 'tipo': tipo})
 
 
-#Quiz: crear, editar y eliminar
+
+# mostrar los enlaces de todos los quiz creados para cada unidad y curso:
+def listar_material(request, idCurso, unidad):
+    quizzes = Quiz.objects.filter(curso_id=idCurso, unidad_id=unidad)
+    # agregar variable para texto y video
+    texto = Contenido.objects.filter(curso_id=idCurso, unidad_id=unidad)
+    video = Video.objects.filter(curso_id=idCurso, unidad_id=unidad)
+    actividad = Actividad.objects.filter(curso_id=idCurso, unidad_id=unidad)
+
+    idCurso = idCurso
+    unidad = unidad
+
+
+    return render(request, 'listar_material.html', {'quizzes': quizzes, 'texto':texto, 'video':video, 'actividad':actividad, 'idCurso': idCurso, 'unidad': unidad})
+
+
+
+
+#Quiz: crear, editar, eliminar y listar
 
 def crear_quiz(request, idCurso, unidad):
     # creamos el quiz sin formulario directamente en la vista usando el modelo Quiz y idCurso y unidad como parametros
@@ -86,22 +103,169 @@ def crear_quiz(request, idCurso, unidad):
     quiz.curso_id = idCurso
     quiz.unidad_id = unidad
     quiz.save()
-    # redireccionamos a listar_quiz
-    return redirect(reverse('listar_quiz', args=[idCurso, unidad]))
+    # redireccionamos a listar_contenido
+    return redirect(reverse('listar_material', args=[idCurso, unidad]))
 
+# edit_quiz solo envia a la lista de quiz
+def edit_quiz(request, id):
+    quiz = Quiz.objects.get(id=id)
+    idCurso = quiz.curso_id
+    unidad = quiz.unidad_id
+    return redirect(reverse('listar_quiz', args=[quiz.id]))
+
+# Eliminar quiz y sus preguntas
+def delete_quiz(request, id):
+    quiz = Quiz.objects.get(id=id)
+    quiz.delete()
+    return redirect(reverse('listar_material', args=[quiz.curso_id, quiz.unidad_id]))
+
+def listar_quiz(request, id):
+    quiz = Quiz.objects.get(id=id)
+    idCurso = quiz.curso_id
+    unidad = quiz.unidad_id
+    questions = Question.objects.filter(quiz_id=id)
+    return render(request, 'listar_quiz.html', {'questions': questions, 'quiz':quiz ,'idCurso': idCurso, 'unidad': unidad})
+
+
+
+# Texto: crear, editar, eliminar
+def crear_texto(request, idCurso, unidad):
+    if request.method == 'POST':
+        form = TextForm(request.POST)
+        if form.is_valid():
+            # Crear una nueva instancia de Contenido y asignar el curso y unidad
+            contenido = Contenido(curso_id=idCurso, unidad_id=unidad)
+            contenido.titulo = form.cleaned_data['titulo']
+            contenido.texto = form.cleaned_data['texto']
+            contenido.save()
+            # Redirigir a la página del quiz
+            return redirect(reverse('listar_material', args=[idCurso, unidad]))
+    else:
+        form = TextForm()
+    return render(request, 'crear_texto.html', {'form': form, 'idCurso': idCurso, 'unidad': unidad})
+# editar texto
+def editar_texto(request, id):
+    contenido = Contenido.objects.get(id=id)
+    idCurso = contenido.curso_id
+    unidad = contenido.unidad_id
+    if request.method == 'POST':
+        form = TextForm(request.POST)
+        if form.is_valid():
+            contenido.titulo = form.cleaned_data['titulo']
+            contenido.texto = form.cleaned_data['texto']
+            contenido.save()
+            return redirect(reverse('listar_material', args=[idCurso, unidad]))
+    else:
+        form = TextForm(initial={'titulo': contenido.titulo, 'texto': contenido.texto})
+    return render(request, 'editar_texto.html', {'form': form, 'idCurso': idCurso, 'unidad': unidad})
+# eliminar texto
+def eliminar_texto(request, id):
+    contenido = Contenido.objects.get(id=id)
+    contenido.delete()
+    return redirect(reverse('listar_material', args=[contenido.curso_id, contenido.unidad_id]))
+
+# Video: crear, editar, eliminar
+def crear_video(request, idCurso, unidad):
+    if request.method == 'POST':
+        form = VideoForm(request.POST)
+        if form.is_valid():
+            # Crear una nueva instancia de Contenido y asignar el curso y unidad
+            video = Video(curso_id=idCurso, unidad_id=unidad)
+            video.titulo = form.cleaned_data['titulo']
+            video.link = form.cleaned_data['link']
+            video.descripcion = form.cleaned_data['descripcion']
+            video.save()
+            # Redirigir a la página del quiz
+            return redirect(reverse('listar_material', args=[idCurso, unidad]))
+    else:
+        form = VideoForm()
+    return render(request, 'crear_video.html', {'form': form, 'idCurso': idCurso, 'unidad': unidad})
+# editar video
+def editar_video(request, id):
+    video = Video.objects.get(id=id)
+    idCurso = video.curso_id
+    unidad = video.unidad_id
+    if request.method == 'POST':
+        form = VideoForm(request.POST)
+        if form.is_valid():
+            video.titulo = form.cleaned_data['titulo']
+            video.link = form.cleaned_data['link']
+            video.descripcion = form.cleaned_data['descripcion']
+            video.save()
+            return redirect(reverse('listar_material', args=[idCurso, unidad]))
+    else:
+        form = VideoForm(initial={'titulo': video.titulo, 'link': video.link, 'descripcion': video.descripcion})
+    return render(request, 'editar_video.html', {'form': form, 'idCurso': idCurso, 'unidad': unidad})
+# eliminar video
+def eliminar_video(request, id):
+    video = Video.objects.get(id=id)
+    video.delete()
+    return redirect(reverse('listar_material', args=[video.curso_id, video.unidad_id]))
+
+
+# Actividad: crear, editar, eliminar y listar
+def crear_actividad(request, idCurso, unidad):
+    if request.method == 'POST':
+        form = ActividadForm(request.POST)
+        if form.is_valid():
+            # Crear una nueva instancia de Actividad y asignar el curso y unidad
+            actividad = Actividad(curso_id=idCurso, unidad_id=unidad)
+            actividad.titulo = form.cleaned_data['titulo']
+            actividad.descripcion = form.cleaned_data['descripcion']
+            actividad.save()
+
+            # Redirigir a la página del quiz
+            return redirect(reverse('listar_material', args=[idCurso, unidad]))
+    else:
+        form = ActividadForm()
+
+    return render(request, 'crear_actividad.html', {'form': form, 'idCurso': idCurso, 'unidad': unidad})
+
+
+
+# editar actividad considerando que se puede editar el titulo, descripción, contenido_texto y preguntas de la actividad
+
+
+
+# eliminar actividad
+def eliminar_actividad(request, id):
+    actividad = Actividad.objects.get(id=id)
+    
+    # y eliminar los contenidos y preguntas asociados a la actividad
+    actividad.contenidos.all().delete()
+    actividad.preguntas.all().delete()
+    actividad.delete()
+
+    return redirect(reverse('listar_material', args=[actividad.curso_id, actividad.unidad_id]))
+
+# listar actividad
+def listar_actividad(request, id):
+    actividad = Actividad.objects.get(id=id)
+    # Si en actividad_contenido no hay contenido con id de actividad, entonces no se muestra nada
+    if actividad.contenidos.count() == 0:
+        actividad_cont = None
+        # si hay contenido, entonces se muestra
+    else:
+        actividad_cont = actividad.contenidos.all()
+    # Si en actividad_preguntas no hay preguntas con id de actividad, entonces no se muestra nada
+    if actividad.preguntas.count() == 0:
+        preguntas_preg = None
+        # si hay preguntas, entonces se muestra
+    else:
+        preguntas_preg = actividad.preguntas.all()
     
 
-def edit_quiz_p(request, id):
-    quiz = Quiz.objects.get(id=id)
+    idCurso = actividad.curso_id
+    unidad = actividad.unidad_id
+    return render(request, 'listar_actividad.html', {'actividad': actividad,'preguntas':preguntas_preg,'contenidos':actividad_cont, 'idCurso': idCurso, 'unidad': unidad})
+
+def create_question2(request, id):
     if request.method == 'POST':
         form = QuestionForm(request.POST)
         if form.is_valid():
-            # Guardar la pregunta y sus opciones
-            question = Question()
 
-            question.quiz_id = quiz.id
-            question.curso_id = quiz.curso_id
-            question.unidad_id = quiz.unidad_id
+            # Crear una nueva instancia de Question sin ningun parametro
+            question = Question()
             question.question_type = form.cleaned_data['question_type']
             question.text = form.cleaned_data['text']
             question.option_a = form.cleaned_data['option_a']
@@ -110,130 +274,44 @@ def edit_quiz_p(request, id):
             question.option_d = form.cleaned_data['option_d']
             question.correct_answer = form.cleaned_data['correct_answer']
             question.save()
-        return redirect('quiz')
+            # Obtener la instancia de la actividad
+            actividad = Actividad.objects.get(id=id)
+            # Agregar la pregunta a la lista de preguntas de la actividad
+            actividad.preguntas.add(question)
+
+            # Redirigir a la página del listar actividades
+            return redirect(reverse('listar_actividad', args=[id]))
+
     else:
         form = QuestionForm()
-    return render(request, 'crear_pregunta.html', {'form': form, 'quiz': quiz})
-
-# edit_quiz solo envia a la lista de quiz
-def edit_quiz(request, id):
-    quiz = Quiz.objects.get(id=id)
-    idCurso = quiz.curso_id
-    unidad = quiz.unidad_id
-    return redirect(reverse('quiz', args=[quiz.id]))
-
-# Eliminar quiz y sus preguntas
-def delete_quiz(request, id):
-    quiz = Quiz.objects.get(id=id)
-    quiz.delete()
-    return redirect(reverse('listar_quiz', args=[quiz.curso_id, quiz.unidad_id]))
+    return render(request, 'crear_pregunta.html', {'form': form, 'id': id})
 
 
-
-def quiz(request, id):
-    quiz = Quiz.objects.get(id=id)
-    idCurso = quiz.curso_id
-    unidad = quiz.unidad_id
-    questions = Question.objects.filter(quiz_id=id)
-    return render(request, 'quiz.html', {'questions': questions, 'quiz':quiz ,'idCurso': idCurso, 'unidad': unidad})
-
-
-
-
-def ver_quiz(request, id_quiz):
-    # Ver el quiz con el id_quiz
-    quiz = Quiz.objects.get(id=id_quiz)
-    return render(request, 'quiz.html', {'quiz': quiz})
-
-
-
-# mostrar los enlaces de todos los quiz creados para cada unidad y curso:
-def listar_material(request, idCurso, unidad):
-    quizzes = Quiz.objects.filter(curso_id=idCurso, unidad_id=unidad)
-    idCurso = idCurso
-    unidad = unidad
-
-    if not quizzes:
-        mensaje = "No existen quizzes para este curso y unidad."
-        return render(request, 'listar_quiz.html', {'mensaje': mensaje, 'idCurso': idCurso, 'unidad': unidad})
-
-    return render(request, 'listar_material.html', {'quizzes': quizzes, 'idCurso': idCurso, 'unidad': unidad})
-
-
-
-def listar_contenido(request, idCurso, unidad):
-    contenido = Contenido.objects.filter(curso_id=idCurso, unidad_id=unidad)
-    return render(request, 'listar_contenido.html', {'contenido': contenido, 'idCurso': idCurso, 'unidad': unidad})
-
-def crear_contenido(request, idCurso, unidad):
+def crear_texto2(request, id):
+    
     if request.method == 'POST':
-        form = ContenidoForm(request.POST)
+        form = TextForm(request.POST)
         if form.is_valid():
-            # Guardar el contenido
+            # Crear una nueva instancia de Contenido y asignar el curso y unidad
+            actividad = Actividad.objects.get(id=id)
             contenido = Contenido()
+            
             contenido.titulo = form.cleaned_data['titulo']
-            contenido.contenido = form.cleaned_data['contenido']
-            contenido.curso_id = idCurso
-            contenido.unidad_id = unidad
+            contenido.texto = form.cleaned_data['texto']
+            contenido.unidad_id = actividad.unidad_id
+            contenido.curso_id = actividad.curso_id
             contenido.save()
-        return redirect(reverse('listar_contenido', args=[idCurso, unidad]))
+            
+            
+            # Agregar el contenido a la lista de contenidos de la actividad
+            actividad.contenidos.add(contenido)
+
+            # Redirigir a la página de listar actividad
+            return redirect(reverse('listar_actividad', args=[id]))
     else:
-        form = ContenidoForm()
-    return render(request, 'crear_contenido.html', {'form': form, 'idCurso': idCurso, 'unidad': unidad})
+        form = TextForm()
 
-
-
-
-
-
-def listar_videos(request, idCurso, unidad):
-    videos = Video.objects.filter(curso_id=idCurso, unidad_id=unidad)
-    return render(request, 'listar_videos.html', {'videos': videos, 'idCurso': idCurso, 'unidad': unidad})
-
-def crear_video(request, idCurso, unidad):
-    if request.method == 'POST':
-        form = ContenidoForm(request.POST)
-        if form.is_valid():
-            # Guardar el contenido
-            video = Video()
-            video.link = form.cleaned_data['titulo']
-            video.descripcion = form.cleaned_data['contenido']
-            video.curso_id = idCurso
-            video.unidad_id = unidad
-            video.save()
-        return redirect(reverse('listar_videos', args=[idCurso, unidad]))
-    else:
-        form = ContenidoForm()
-    return render(request, 'crear_video.html', {'form': form, 'idCurso': idCurso, 'unidad': unidad})
-
-
-
-
-
-def listar_actividad(request, idCurso, unidad):
-    actividades = Actividad.objects.filter(curso_id=idCurso, unidad_id=unidad)
-    return render(request, 'listar_actividad.html', {'actividades': actividades, 'idCurso': idCurso, 'unidad': unidad})
-
-def crear_actividad(request, idCurso, unidad):
-    if request.method == 'POST':
-        form = ContenidoForm(request.POST)
-        if form.is_valid():
-            # Guardar el contenido
-            actividad = Actividad()
-            actividad.titulo = form.cleaned_data['titulo']
-            actividad.contenido = form.cleaned_data['contenido']
-            actividad.curso_id = idCurso
-            actividad.unidad_id = unidad
-            actividad.save()
-        return redirect(reverse('listar_actividades', args=[idCurso, unidad]))
-    else:
-        form = ContenidoForm()
-    return render(request, 'crear_actividad.html', {'form': form, 'idCurso': idCurso, 'unidad': unidad})
-
-
-
-
-
+    return render(request, 'crear_texto2.html', {'form': form, 'id': id})
 # Respuesta Usuario
 
 @login_required 

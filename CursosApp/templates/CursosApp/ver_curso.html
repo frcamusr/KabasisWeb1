@@ -5,32 +5,50 @@
         <h1 style="text-align: center; color: white; margin-top: -50px;">{{ curso.nombre | upper }}</h1>
         <div class="container">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <div class="text-center">
                         <a class="btn btn-success btn-block" href="{% url 'listar_unidad' curso.id%}">Administrar unidades</a>
                     </div>
                     <div class="mt-3">
                         {% for unidad in unidades %}
-                        <button class="oval-button mb-3" onclick="handleButtonClick('{{ unidad.titulo }}')">
+                        <button class="oval-button mb-3" data-id="{{ unidad.id }}"  onclick="handleButtonClick(this)">
                             {{ unidad.titulo }}
                         </button>
                         {% endfor %}
                     </div>
                 </div>
-                <div class="col-md-8">
-                    <div class="text-center p-4" style="background-color: white; border: 0.3cm solid #296FFA; border-radius: 5px; height:70vh">
-                        <h2 style="margin-bottom: 0;">Sin Contenido</h2>
+                <div class="col-md-2 mid">
+                    <div class="text-center p-4" style="background-color: white; border: 0.1cm solid #296FFA; border-radius: 5px; height:70vh">
+                        <h5 style="margin-bottom: 0;">Contenido</h5>
+                        {% for contenido in contenido %}
+                        
+                            {% if contenido.unidad == selectedUnitId %}  <!-- Verifica si el contenido pertenece a la unidad seleccionada -->
+                                <h6>{{ contenido.titulo }}</h6>
+
+
+                            {% endif %}
+                        {% empty %}
+                            <p>Sin Contenido</p>
+                        {% endfor %}
                     </div>
                 </div>
                 
+                <div class="col-md-8">
+                    <div class="text-center p-4" style="background-color: white; border: 0.1cm solid #296FFA; border-radius: 5px; height:70vh">
+                        <h2 style="margin-bottom: 0;">Sin Contenido</h2>
+                        
+
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
 
     <style>
         .oval-button {
-            width: 220px;
-            height: 100px;
+            width: 150px;
+            height: 80px;
             background-image: linear-gradient(to top, rgba(150, 0, 0, 0.6), #123989, #296FFA, rgba(150, 0, 0, 0.6));
             color: white;
             border-radius: 50%;
@@ -39,26 +57,17 @@
 
 
     <script>
-        // Obtén una lista de todos los botones de las unidades
-        var buttons = document.querySelectorAll('.oval-button');
 
-        // Función para manejar el clic en los botones de las unidades
-        function handleButtonClick(titulo) {
-            // Actualiza el contenido en la columna derecha con el título de la unidad
-            var contenidoDerecha = document.querySelector('.col-md-8 h2');
-            contenidoDerecha.textContent = titulo;
+        var buttons = document.querySelectorAll('.oval-button');
+        // asignar a IdSeleccionado el valor de data-id del primer boton
+        var resultado = 4;
+        document.getElementById("resultado").innerHTML = resultado;
+        function handleButtonClick(button) {
+            var contenidoDerecha = document.querySelector('.col-md-8  h2');
+            contenidoDerecha.textContent = button.textContent;
+
         }
 
-        // Asocia el evento de clic a cada botón de las unidades
-        buttons.forEach(function(button) {
-            button.addEventListener('click', function() {
-                // Obtiene el título de la unidad del botón clicado
-                var titulo = button.textContent.trim();
 
-                // Llama a la función para manejar el clic y pasa el título de la unidad
-                handleButtonClick(titulo);
-            });
-        });
     </script>
 {% endblock %}
-

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Nuevo Contenido</title>
+</head>
+
+<body>
+    <h1>Crear Nuevo Contenido</h1>
+
+    <form method="post" action="{% url 'crear_texto' idCurso unidad %}">
+        {% csrf_token %}
+        <input type="hidden" name="idCurso" value="{{ idCurso }}">
+        <input type="hidden" name="unidad" value="{{ unidad }}">
+        
+        <label for="titulo">Título:</label>
+        <input type="text" id="titulo" name="titulo" required><br>
+
+        <label for="contenido">Contenido:</label><br>
+        <textarea id="contenido" name="texto" rows="4" cols="50" required></textarea><br>
+
+        <input type="submit" value="Crear Contenido">
+    </form>
+
+    <a href="{% url 'listar_material' idCurso unidad %}">
+        <button>Volver a la Lista de Contenidos</button>
+    </a>
+</body>
+
+</html>

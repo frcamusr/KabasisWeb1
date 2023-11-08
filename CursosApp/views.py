@@ -5,6 +5,7 @@ from .forms import CursoForm, UnidadForm
 from .models import Curso, UnidadCurso
 
 from django.contrib import messages
+from SurveyApp.models import Quiz, Contenido, Video, Actividad
 
 # Create your views here.
 
@@ -73,10 +74,21 @@ def eliminar_curso(request, id):
 def ver_curso(request, id):
     curso = Curso.objects.get(pk=id)
     unidades = UnidadCurso.objects.filter(curso=curso).order_by('orden')
-    
+    quiz = Quiz.objects.filter(curso=curso)
+    contenido = Contenido.objects.filter(curso=curso)
+    video = Video.objects.filter(curso=curso)
+    actividad = Actividad.objects.filter(curso=curso)
+
     data = {
         'curso': curso,
         'unidades': unidades,
+        'quiz': quiz,
+        'contenido': contenido,
+        'video': video,
+        'actividad': actividad,
+
+
+        
     }
     
     return render(request, 'CursosApp/ver_curso.html', data)
